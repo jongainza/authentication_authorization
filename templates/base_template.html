@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://bootswatch.com/4/flatly/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.1/css/fontawesome.min.css"
+    />
+    <title>{% block title %} base {% endblock %}</title>
+  </head>
+  <body>
+    <nav class="navbar navbar-light bg-primary justify-content-between">
+      <div class="container">
+        <a href="/" class="navbar-brand text-light">Bootcamp Practice</a>
+        <ul class="nav navbar-nav flex-row float-right">
+          {% if session["username"] %}
+          <li class="nav-item">
+            <a class="nav-link pr-3 text-light" href="/logout"
+              >~{{session['username']}}~Logout</a
+            >
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link pr-3 text-light" href="/login">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-light" href="/register">Sign Up</a>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container" style="margin-top: 2em">
+      {% for category,msg in get_flashed_messages(with_categories=True) %}
+      <div class="alert alert-{{category}}">{{ msg }}</div>
+      {% endfor %} {% block content %} {% endblock %}
+    </div>
+  </body>
+</html>
