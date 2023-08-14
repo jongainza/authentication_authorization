@@ -4,6 +4,15 @@
 <p class="lead">First Name: {{user.first_name}}</p>
 <p class="lead">Last Name: {{user.last_name}}</p>
 <p class="lead">Email: {{user.email}}</p>
+<form
+  style="display: inline"
+  action="/feedback/{{user.username}}/delete_user"
+  method="POST"
+>
+  <button class="btn btn-danger">
+    <i class="fa-solid fa-trash">Delete User</i>
+  </button>
+</form>
 
 <ul>
   {% for feedback in feedbacks %}

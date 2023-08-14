@@ -33,16 +33,34 @@ def register_user():
     form = UserForm()
     if form.validate_on_submit():
         username = form.username.data
+        existing_user = User.query.filter_by(username=username).first()
+
+        if existing_user:
+            flash(
+                "Username already exists. Please choose a different username", "danger"
+            )
+            return redirect("/register")
+
         password = form.password.data
         email = form.email.data
+        existing_email = User.query.filter_by(email=email).first()
+
+        if existing_email:
+            flash(
+                "Email already exists. Please choose a different Email or login",
+                "danger",
+            )
+            return redirect("/register")
+
         first_name = form.first_name.data
         last_name = form.last_name.data
+
         new_user = User.register(username, password, email, first_name, last_name)
         db.session.add(new_user)
         db.session.commit()
         session["username"] = new_user.username
         flash("Welcome!, You have register successfully!!", "primary")
-        return redirect("/secret")
+        return redirect(f"/users/{new_user.username}")
     else:
         for field, errors in form.errors.items():
             for error in errors:
@@ -103,7 +121,7 @@ def show_feedback(username):
     user = User.query.get_or_404(username)
     if "username" not in session:
         flash("Please log in first", "danger")
-        return redirect("/")
+        return redirect("/login")
 
     form = FeedbackForm()
 
@@ -125,7 +143,14 @@ def show_feedback(username):
 
 @app.route("/feedback/<username>/edit/<int:id>", methods=["GET", "POST"])
 def edit_feedback(username, id):
+    # if "username" not in session:
+    #     flash("Please log in first", "danger")
+    #     return redirect("/login")
     feedback = Feedback.query.get_or_404(id)
+    if username != session["username"]:
+        flash("improper user", "danger")
+        return redirect(f"/users/{session['username']}")
+
     user = User.query.get_or_404(username)
     form = FeedbackForm(obj=feedback)
 
@@ -146,13 +171,32 @@ def edit_feedback(username, id):
 def delete_post(username, id):
     feedback = Feedback.query.get_or_404(id)
     user = User.query.get_or_404(username)
+
     if "username" not in session:
         flash("Please log in first!", "danger")
         return redirect("/login")
+
     if feedback.username == session["username"]:
         db.session.delete(feedback)
         db.session.commit()
         flash("Feedback Delated!", "info")
         return redirect(f"/users/{user.username}")
+
     flash("You do not have permission to do that", "danger")
+    return redirect("/")
+
+
+@app.route("/feedback/<username>/delete_user", methods=["POST"])
+def delete_user(username):
+    feedbacks = Feedback.query.filter_by(username=username).all()
+    user = User.query.get_or_404(username)
+
+    for feedback in feedbacks:
+        db.session.delete(feedback)
+
+    db.session.delete(user)
+    logout_user()
+    db.session.commit()
+
+    flash("User and associated feedbacks have been delated!", "info")
     return redirect("/")
