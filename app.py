@@ -9,7 +9,7 @@ app.app_context().push()
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_ECHO"] = True
 app.config["SECRET_KEY"] = "abc123"
-app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
+app.confdgfvadzxvadfvzig["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
 
 connect_db(app)
 db.create_all()
